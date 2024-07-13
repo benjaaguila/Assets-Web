@@ -38,7 +38,7 @@ Sigue estos pasos para ejecutar el proyecto en tu entorno local:
 
   
 
-4. Abre tu navegador y visita `http://localhost:3001` para ver la aplicación en funcionamiento.
+4. Abre tu navegador y visita http://localhost:3001 para ver la aplicación en funcionamiento.
 
   
 
