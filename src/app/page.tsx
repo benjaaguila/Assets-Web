@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 
-// Definición de tipos
 interface Manager {
   managerName: string;
   totalAmountManaged: number;
@@ -20,18 +19,20 @@ const ClientListPage: React.FC = () => {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [managers, setManagers] = useState<Manager[]>([]);
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
   useEffect(() => {
     // Fetch clients data
-    fetch('http://localhost:3000/clients')
+    fetch(`${apiUrl}/clients`)
       .then(response => response.json())
       .then(data => setClients(data))
       .catch(error => console.error('Error fetching clients:', error));
-  }, []);
+  }, [apiUrl]);
 
   const handleViewClient = (client: Client) => {
     setSelectedClient(client);
     // Fetch managers data for the selected client
-    fetch(`http://localhost:3000/payments/${client.name}`)
+    fetch(`${apiUrl}/payments/${client.name}`)
       .then(response => response.json())
       .then(data => setManagers(data))
       .catch(error => console.error('Error fetching managers:', error));
