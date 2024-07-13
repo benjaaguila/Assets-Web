@@ -4,65 +4,42 @@ import React, { useState, useEffect } from 'react';
 
 // Definición de tipos
 interface Manager {
-  id: number;
-  name: string;
-  totalManagedAmount: number;
-  image: string;
+  managerName: string;
+  totalAmountManaged: number;
 }
 
 interface Client {
-  id: number;
+  clientId: string;
   name: string;
-  managers: Manager[];
-  totalPaymentsReceived: number;
+  totalPaymentsRecibedFromDebtors: number;
 }
 
 // Componente ClientListPage
 const ClientListPage: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [managers, setManagers] = useState<Manager[]>([]);
 
   useEffect(() => {
-    // Simulación de datos hardcodeados
-    const simulatedClients: Client[] = [
-      {
-        id: 1,
-        name: 'Cliente A',
-        managers: [
-          { id: 1, name: 'Gestor 1', totalManagedAmount: 1500, image: "https://flowbite.com/docs/images/people/profile-picture-1.jpg" },
-          { id: 2, name: 'Gestor 2', totalManagedAmount: 2000, image: "https://flowbite.com/docs/images/people/profile-picture-2.jpg" },
-        ],
-        totalPaymentsReceived: 5000
-      },
-      {
-        id: 2,
-        name: 'Cliente B',
-        managers: [
-          { id: 3, name: 'Gestor 3', totalManagedAmount: 2500, image: "https://flowbite.com/docs/images/people/profile-picture-3.jpg" },
-        ],
-        totalPaymentsReceived: 3000
-      },
-      {
-        id: 3,
-        name: 'Cliente C',
-        managers: [
-          { id: 4, name: 'Gestor 4', totalManagedAmount: 3000, image: "https://flowbite.com/docs/images/people/profile-picture-4.jpg" },
-          { id: 5, name: 'Gestor 5', totalManagedAmount: 1800, image: "https://flowbite.com/docs/images/people/profile-picture-5.jpg" },
-        ],
-        totalPaymentsReceived: 7000
-      },
-    ];
-
-    // Establecer los datos simulados al estado
-    setClients(simulatedClients);
+    // Fetch clients data
+    fetch('http://localhost:3000/clients')
+      .then(response => response.json())
+      .then(data => setClients(data))
+      .catch(error => console.error('Error fetching clients:', error));
   }, []);
 
   const handleViewClient = (client: Client) => {
     setSelectedClient(client);
+    // Fetch managers data for the selected client
+    fetch(`http://localhost:3000/payments/${client.name}`)
+      .then(response => response.json())
+      .then(data => setManagers(data))
+      .catch(error => console.error('Error fetching managers:', error));
   };
 
   const handleBackToList = () => {
     setSelectedClient(null);
+    setManagers([]);
   };
 
   if (selectedClient) {
@@ -73,17 +50,16 @@ const ClientListPage: React.FC = () => {
             <button onClick={handleBackToList} className="mb-4 text-blue-600 hover:underline">&larr; Volver a la lista</button>
             <h1 className="text-3xl font-bold mb-4 text-gray-800">Información del Cliente</h1>
             <h2 className="text-2xl font-bold mb-2 text-gray-800">{selectedClient.name}</h2>
-            <p className="text-xl mb-4 text-gray-700">Abono total recibido: ${selectedClient.totalPaymentsReceived}</p>
+            <p className="text-xl mb-4 text-gray-700">Abono total recibido: ${selectedClient.totalPaymentsRecibedFromDebtors}</p>
           </div>
           
           <div className="flex flex-col space-y-2 divide-y">
-            {selectedClient.managers.map((manager) => (
-              <div key={manager.id} className="flex justify-between space-x-6 items-center p-6">
+            {managers.map((manager, index) => (
+              <div key={index} className="flex justify-between space-x-6 items-center p-6">
                 <div className="flex items-center space-x-4">
-                  <img src={manager.image} className="rounded-full h-14 w-14" alt={manager.name} />
                   <div className="flex flex-col space-y-2">
-                    <span className="font-medium text-gray-800">{manager.name}</span>
-                    <span className="text-sm text-gray-600">Monto gestionado: ${manager.totalManagedAmount}</span>
+                    <span className="font-medium text-gray-800">{manager.managerName}</span>
+                    <span className="text-sm text-gray-600">Monto gestionado: ${manager.totalAmountManaged}</span>
                   </div>
                 </div>
               </div>
@@ -103,10 +79,10 @@ const ClientListPage: React.FC = () => {
         
         <div className="flex flex-col space-y-2 divide-y">
           {clients.map((client) => (
-            <div key={client.id} className="flex justify-between space-x-6 items-center p-6">
+            <div key={client.clientId} className="flex justify-between space-x-6 items-center p-6">
               <div className="flex flex-col space-y-2">
                 <span className="font-medium text-gray-800">{client.name}</span>
-                <span className="text-sm text-gray-600">Abono total: ${client.totalPaymentsReceived}</span>
+                <span className="text-sm text-gray-600">Abono total: ${client.totalPaymentsRecibedFromDebtors}</span>
               </div>
               <div>
                 <button 
